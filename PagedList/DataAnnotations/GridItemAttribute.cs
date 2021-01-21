@@ -4,12 +4,29 @@ using System.Runtime.CompilerServices;
 
 namespace PagedList.DataAnnotations
 {
+    /// <summary>
+    /// Provides property customization
+    /// </summary>
     public class GridItemAttribute : Attribute, IFieldProperties
     {
+        /// <summary>
+        /// Column/List order
+        /// </summary>
         public int Order { get; set; }
+
+        /// <summary>
+        /// Friendly name to display in front-end
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Real property name
+        /// </summary>
         public string PropertyName { get; private set; }
 
+        /// <summary>
+        /// Provides property customization
+        /// </summary>
         public GridItemAttribute(int order, [CallerMemberName] string propertyName = null) : base()
         {
             Order = order;

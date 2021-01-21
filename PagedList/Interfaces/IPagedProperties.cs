@@ -2,10 +2,14 @@
 
 namespace PagedList.Interfaces
 {
+    /// <summary>
+    /// Represents Paged List Properties of <typeparamref name="T"/>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IPagedProperties<T>
     {
         /// <summary>
-        /// Paged list
+        /// Paged list items
         /// </summary>
         IList<T> Items { get; }
 
@@ -20,7 +24,7 @@ namespace PagedList.Interfaces
         int PageSize { get; }
 
         /// <summary>
-        /// Total count
+        /// Total count of items
         /// </summary>
         int TotalCount { get; }
 
@@ -30,7 +34,7 @@ namespace PagedList.Interfaces
         int TotalPages { get; }
 
         /// <summary>
-        /// Ordering
+        /// Ordering field
         /// </summary>
         string OrderBy { get; }
 

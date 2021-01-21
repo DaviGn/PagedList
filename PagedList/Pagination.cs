@@ -6,6 +6,13 @@ namespace PagedList
 {
     internal static class Pagination
     {
+        /// <summary>
+        /// Creates a list of page numbers
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pagedList">Paged List object</param>
+        /// <param name="pagesToShow">Number of pages in the list</param>
+        /// <returns></returns>
         public static IList<int> CreatePagination<T>(this IPagedList<T> pagedList, int pagesToShow = 8) where T : class
         {
             bool hasFirstLink = false;

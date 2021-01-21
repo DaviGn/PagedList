@@ -3,20 +3,24 @@
 namespace PagedList.Interfaces
 {
     /// <summary>
-    /// Paged list interface
+    /// Represents a Paged List of <typeparamref name="T"/>
     /// </summary>
     public interface IPagedList<T> : IPagedProperties<T>, IList<T>
     {
         /// <summary>
-        /// Has previous page
+        /// Indicates if there's previous page
         /// </summary>
         bool HasPreviousPage { get; }
 
         /// <summary>
-        /// Has next age
+        /// Indicates if there's next page
         /// </summary>
         bool HasNextPage { get; }
 
-        IPagedListReturn<T> GetPagedReturn();
+        /// <summary>
+        /// Creates an object of type IPagedListReturn of <typeparamref name="T"/>
+        /// </summary>
+        /// <returns>IPagedListReturn of <typeparamref name="T"/></returns>
+        IPagedListReturn<T> ToPagedReturn();
     }
 }

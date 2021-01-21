@@ -6,8 +6,16 @@ using System.Reflection;
 
 namespace PagedList
 {
+    /// <summary>
+    /// Provides fields information
+    /// </summary>
     internal static class FieldsProperties
     {
+        /// <summary>
+        /// Generates an IEnumerable object of IFieldProperties of <typeparamref name="T"/> properties
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static IEnumerable<IFieldProperties> GetFields<T>() where T : class
         {
             var properties = typeof(T).GetProperties();

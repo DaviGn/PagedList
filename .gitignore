@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/PagedList/v16
+/APIExample/obj
+/PagedList/bin/Debug/netstandard2.1
+/PagedList/obj
+/APIExample/bin/Debug/net5.0
