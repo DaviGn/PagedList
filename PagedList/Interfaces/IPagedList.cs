@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PagedList.Interfaces
 {
@@ -16,6 +17,17 @@ namespace PagedList.Interfaces
         /// Indicates if there's next page
         /// </summary>
         bool HasNextPage { get; }
+
+        /// <summary>
+        /// Performs query executing
+        /// </summary>
+        void Fill();
+
+        /// <summary>
+        /// Performs query executing async
+        /// </summary>
+        /// <returns></returns>
+        Task FillAsync();
 
         /// <summary>
         /// Creates an object of type IPagedListReturn of <typeparamref name="T"/>

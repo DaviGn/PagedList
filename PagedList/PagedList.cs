@@ -1,5 +1,7 @@
-﻿using PagedList.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using PagedList.Interfaces;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PagedList
 {
@@ -9,6 +11,9 @@ namespace PagedList
     /// <typeparam name="TEntity"></typeparam>
     public class PagedList<TEntity> : BasePagedList<TEntity>, IPagedList<TEntity> where TEntity : class
     {
+        private readonly IQueryable<TEntity> _dBSetQuery;
+        private readonly IPagedListModel<TEntity> _pagedModel;
+
         /// <summary>
         /// Creates a PagedList by an IQueryable of <typeparamref name="TEntity"/>
         /// </summary>
@@ -24,28 +29,70 @@ namespace PagedList
         /// <param name="pagedModel">IPagedListModel of <typeparamref name="TEntity"/></param>
         public PagedList(IQueryable<TEntity> DBSetQuery, IPagedListModel<TEntity> pagedModel)
         {
-            var query = pagedModel.GetQuery(DBSetQuery);
+            _dBSetQuery = DBSetQuery;
+            _pagedModel = pagedModel;
+        }
 
-            if (pagedModel is IIncludable<TEntity>)
-                query = (pagedModel as IIncludable<TEntity>).GetIncludes(query);
+        /// <summary>
+        /// Performs query executing
+        /// </summary>
+        public void Fill()
+        {
+            var query = Process();
+            Execute(query);
+        }
 
+        /// <summary>
+        /// Performs query executing async
+        /// </summary>
+        /// <returns></returns>
+        public async Task FillAsync()
+        {
+            var query = Process();
+            await ExecuteAsync(query);
+        }
+
+        private IQueryable<TEntity> Process()
+        {
+            var query = _pagedModel.GetQuery(_dBSetQuery);
+
+            if (_pagedModel is IIncludable<TEntity>)
+                query = (_pagedModel as IIncludable<TEntity>).GetIncludes(query);
+
+            if (_pagedModel.PageIndex > 0)
+                _pagedModel.PageIndex--;
+
+            PageSize = _pagedModel.PageSize;
+            PageIndex = _pagedModel.PageIndex;
+
+            OrderBy = _pagedModel.OrderBy;
+            Ascending = !_pagedModel.Ascending;
+
+            return query;
+        }
+
+        private void Execute(IQueryable<TEntity> query)
+        {
             var total = query.Count();
             TotalCount = total;
-            TotalPages = total / pagedModel.PageSize;
+            TotalPages = total / _pagedModel.PageSize;
 
-            if (total % pagedModel.PageSize > 0)
+            if (total % _pagedModel.PageSize > 0)
                 TotalPages++;
 
-            if (pagedModel.PageIndex > 0)
-                pagedModel.PageIndex--;
+            AddRange(query.Skip(_pagedModel.PageIndex * _pagedModel.PageSize).Take(_pagedModel.PageSize).ToList());
+        }
 
-            PageSize = pagedModel.PageSize;
-            PageIndex = pagedModel.PageIndex;
+        private async Task ExecuteAsync(IQueryable<TEntity> query)
+        {
+            var total = await query.CountAsync();
+            TotalCount = total;
+            TotalPages = total / _pagedModel.PageSize;
 
-            OrderBy = pagedModel.OrderBy;
-            Ascending = !pagedModel.Ascending;
+            if (total % _pagedModel.PageSize > 0)
+                TotalPages++;
 
-            AddRange(query.Skip(pagedModel.PageIndex * pagedModel.PageSize).Take(pagedModel.PageSize).ToList());
+            AddRange(await query.Skip(_pagedModel.PageIndex * _pagedModel.PageSize).Take(_pagedModel.PageSize).ToListAsync());
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PagedList;
+using System.Threading.Tasks;
 
 namespace APIExample.Controllers
 {
@@ -15,9 +16,9 @@ namespace APIExample.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get([FromQuery]UserViewModel empresaViewModel)
+        public async Task<IActionResult> Get([FromQuery] UserViewModel empresaViewModel)
         {
-            var pagedList = _context.Users.ToPagedList(empresaViewModel);
+            var pagedList = await _context.Users.ToPagedListAsync(empresaViewModel);
 
             return new OkObjectResult(pagedList);
         }
