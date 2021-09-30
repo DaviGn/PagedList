@@ -3,6 +3,39 @@ using System.Collections.Generic;
 
 namespace PagedList
 {
+    public class PagedListReturn<T, VO> : PagedProperties<VO>, IPagedListReturn<VO> where T : class
+                                                                                    where VO : class
+    {
+        public PagedListReturn(IPagedList<T> pagedList, IList<VO> items)
+        {
+            Items = items;
+
+            TotalPages = pagedList.TotalPages;
+            PageIndex = pagedList.PageIndex + 1;
+            TotalCount = pagedList.TotalCount;
+            OrderBy = pagedList.OrderBy;
+            Ascending = pagedList.Ascending;
+            HasNextPage = pagedList.HasNextPage;
+            HasPreviousPage = pagedList.HasPreviousPage;
+            PageSize = pagedList.PageSize;
+
+            Pages = pagedList.CreatePagination();
+            Fields = FieldsProperties.GetFields<VO>();
+        }
+
+        /// <summary>
+        /// List of page numbers. I.E: [1, 2, -1, 98, 99].
+        /// Page number -1 represents a white space or ...
+        /// </summary>
+        public IEnumerable<int> Pages { get; set; }
+
+        /// <summary>
+        /// List of properties information of <typeparamref name="T"/>
+        /// </summary>
+        public IEnumerable<IFieldProperties> Fields { get; set; }
+    }
+
+
     /// <summary>
     /// Represents a complete information of a Paged List
     /// </summary>

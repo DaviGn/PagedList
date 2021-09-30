@@ -66,7 +66,7 @@ namespace PagedList
             PageIndex = _pagedModel.PageIndex;
 
             OrderBy = _pagedModel.OrderBy;
-            Ascending = !_pagedModel.Ascending;
+            Ascending = _pagedModel.Ascending;
 
             return query;
         }

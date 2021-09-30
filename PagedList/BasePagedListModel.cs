@@ -28,6 +28,12 @@ namespace PagedList
         /// </summary>
         public string OrderBy { get; set; }
 
+
+        /// <summary>
+        /// Ordering expression
+        /// </summary>
+        protected Expression<Func<TModel, dynamic>> OrderByExpression { get; set; }
+
         /// <summary>
         /// Ordering direction
         /// </summary>
@@ -42,7 +48,9 @@ namespace PagedList
         /// <returns>IQueryable of <typeparamref name="TModel"/> including filters and ordering clauses</returns>
         public IQueryable<TModel> GetQuery(IQueryable<TModel> query)
         {
-            query = query.Where(GetFilters());
+            if (filtersDictionary.Any())
+                query = query.Where(GetFilters());
+
             query = GetOrdering(query);
 
             return query;
@@ -68,8 +76,20 @@ namespace PagedList
         /// <returns>IQueryable of <typeparamref name="TModel"/> with ordering clause</returns>
         private IQueryable<TModel> GetOrdering(IQueryable<TModel> source)
         {
+            if (OrderByExpression != null)
+            {
+                return Ascending ? source.OrderBy(OrderByExpression) : source.OrderByDescending(OrderByExpression);
+            }
+
             if (string.IsNullOrEmpty(OrderBy))
                 return source;
+
+            if (OrderBy.IndexOf(".") != -1)
+            {
+                var lambdaProperty = ToLambda<TModel>(OrderBy);
+
+                return Ascending ? source.OrderBy(lambdaProperty) : source.OrderByDescending(lambdaProperty);
+            }
 
             ParameterExpression parameter = Expression.Parameter(source.ElementType, "");
 
@@ -83,6 +103,16 @@ namespace PagedList
                                   source.Expression, Expression.Quote(lambda));
 
             return source.Provider.CreateQuery<TModel>(methodCallExpression);
+        }
+
+        private Expression<Func<T, object>> ToLambda<T>(string propertyName)
+        {
+            var propertyNames = propertyName.Split('.');
+            var parameter = Expression.Parameter(typeof(T));
+            Expression body = parameter;
+            foreach (var propName in propertyNames)
+                body = Expression.Property(body, propName);
+            return Expression.Lambda<Func<T, object>>(body, parameter);
         }
 
         /// <summary>

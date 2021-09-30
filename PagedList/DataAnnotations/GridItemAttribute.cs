@@ -25,12 +25,24 @@ namespace PagedList.DataAnnotations
         public string PropertyName { get; private set; }
 
         /// <summary>
+        /// Set as field sortable
+        /// </summary>
+        public bool Sortable { get; private set; }
+
+        /// <summary>
+        /// Sort query
+        /// </summary>
+        public string SortBy { get; private set; }
+
+        /// <summary>
         /// Provides property customization
         /// </summary>
-        public GridItemAttribute(int order, [CallerMemberName] string propertyName = null) : base()
+        public GridItemAttribute(int order, [CallerMemberName] string propertyName = null, bool sortable = true, string sortBy = null) : base()
         {
             Order = order;
             PropertyName = ToCamelCase(propertyName);
+            Sortable = sortable;
+            SortBy = !string.IsNullOrEmpty(sortBy) ? sortBy : PropertyName;
 
             if (string.IsNullOrEmpty(Name))
                 Name = propertyName;
