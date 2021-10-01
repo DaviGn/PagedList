@@ -1,24 +1,27 @@
 # PagedList
 
-A library for easily paging through any IQueryable in ASP.NET/ASP.NET Core.
-It enables you to easily take an IEnumerable/IQueryable, chop it up into "pages", and grab a specific "page" by an index.
+A library for easily paging through any IQueryable in .NET Core.
+It enables you to easily take an IQueryable, chop it up into "pages", and grab a specific "page" by an index.
 
-It can be useful for paginated Grid view or Infinite scroll implementation, once it provides all needed information to implement it.
+It can be useful for paginated Grid view, API JSON array return or Infinite scroll implementation, once it provides all needed information to implement it.
 
 The query is automatically generated according to the Paged Model filters implementation.
-Paged Model is a class which represents the filters in the query, related properties including and ordering.
 
 # Important resources
-- BasePagedListModel<T>: base class for a Paged Model implementation. This class auto generates the query ;
-- IIncludable<T>: an interface which can be used for related property including;
+- BasePagedListModel<T>: base class for a Paged Model implementation. This class auto generates the query. The library also exposes the IPagedListModel<T> interface, which you can use abstracting implementations;
+- IIncludable<T>: implementations of PagedListModel which implements this interface are enabled to include entities related properties;
 
 # Folders description
 - APIExample: a .NET Core API including two examples os usage;
 - PagedList: the library source code.
-
+  
+# Dependencies
+The library depends on:
+- Entity Framework Core 3.0.0 or higher;
+ 
 # How to use
 You can find examples using EF Core in APIExample project.
-Here follows an example of usage in a Controller
+Here follows an example of usage in a Controller. You can use sync/async methods. 
 
 ```csharp
 public class BusinessController : ControllerBase
@@ -31,16 +34,28 @@ public class BusinessController : ControllerBase
   }
 
   [HttpGet]
-  public IActionResult Get([FromQuery]BusinessViewModel businessViewModel)
+  public Task<IActionResult> Get([FromQuery]BusinessViewModel businessViewModel)
   {
-      var pagedList = _context.Business.ToPagedList(businessViewModel);
+      var pagedList = await _context.Business.ToPagedListAsync(businessViewModel);
 
-      return new OkObjectResult(pagedList);
+      return Ok(pagedList);
   }
 }
 ```
+  
+The extension method ToPagedList is as follows:
+  
+```csharp
+public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IQueryable<T> DBSetQuery) where T : class
+{
+    var pagedList = new PagedList<T>(DBSetQuery);
+    await pagedList.FillAsync();
 
-The View Model implementation example is as follow. The CNPJ property is a filter example that can be passed in the Query string.
+    return pagedList;
+}
+```
+
+The Paged DTO implementation is as follow. The CNPJ property is a filter example that can be passed in the Querystring.
 
 ```csharp
 public class BusinessViewModel : BasePagedListModel<Business>
