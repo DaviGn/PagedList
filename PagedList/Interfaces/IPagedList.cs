@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PagedList.Interfaces
@@ -27,7 +28,7 @@ namespace PagedList.Interfaces
         /// Performs query executing async
         /// </summary>
         /// <returns></returns>
-        Task FillAsync();
+        Task FillAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates an object of type IPagedListReturn of <typeparamref name="T"/>

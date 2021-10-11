@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PagedList.Interfaces;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PagedList
@@ -46,10 +47,10 @@ namespace PagedList
         /// Performs query executing async
         /// </summary>
         /// <returns></returns>
-        public async Task FillAsync()
+        public async Task FillAsync(CancellationToken cancellationToken = default)
         {
             var query = Process();
-            await ExecuteAsync(query);
+            await ExecuteAsync(query, cancellationToken);
         }
 
         private IQueryable<TEntity> Process()
@@ -83,16 +84,17 @@ namespace PagedList
             AddRange(query.Skip(_pagedModel.PageIndex * _pagedModel.PageSize).Take(_pagedModel.PageSize).ToList());
         }
 
-        private async Task ExecuteAsync(IQueryable<TEntity> query)
+
+        private async Task ExecuteAsync(IQueryable<TEntity> query, CancellationToken token = default)
         {
-            var total = await query.CountAsync();
+            var total = await query.CountAsync(token);
             TotalCount = total;
             TotalPages = total / _pagedModel.PageSize;
 
             if (total % _pagedModel.PageSize > 0)
                 TotalPages++;
 
-            AddRange(await query.Skip(_pagedModel.PageIndex * _pagedModel.PageSize).Take(_pagedModel.PageSize).ToListAsync());
+            AddRange(await query.Skip(_pagedModel.PageIndex * _pagedModel.PageSize).Take(_pagedModel.PageSize).ToListAsync(token));
         }
 
         /// <summary>
